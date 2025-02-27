@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend  # Usa o Dockerfile do backend
+    ports:
+      - "8080:8080"   # Mapeia a porta 8080 do container para o host
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev  # Define o perfil do Spring Boot
+    networks:
+      - app-network  # Conecta ao mesmo network do frontend
+    volumes:
+      - ./backend:/app  # Monta a pasta backend no container
+    restart: unless-stopped  # Reinicia o serviço se falhar
+
+  frontend:
+    build: ./frontend  # Usa o Dockerfile do frontend
+    ports:
+      - "4200:4200"   # Mapeia a porta 4200 do container para o host
+    depends_on:
+      - backend  # Garante que o backend suba antes do frontend
+    networks:
+      - app-network  # Conecta ao mesmo network do backend
+    volumes:
+      - ./frontend:/app  # Monta a pasta frontend no container
+    restart: unless-stopped  # Reinicia o serviço se falhar
+
+networks:
+  app-network:
+    driver: bridge  # Cria uma rede interna para os serviços se comunicarem
